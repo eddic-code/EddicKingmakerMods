@@ -1,0 +1,8 @@
+{
+  "Id": "EddicKingmakerTweaks",
+  "DisplayName": "EddicKingmakerTweaks",
+  "Author": "Eddic",
+  "Version": "1.0",
+  "AssemblyName": "EddicKingmakerTweaks.dll",
+  "EntryMethod": "EddicKingmakerTweaks.Main.Load"
+}

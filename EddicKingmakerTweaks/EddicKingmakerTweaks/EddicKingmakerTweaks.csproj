@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>EddicKingmakerTweaks</RootNamespace>
+    <AssemblyName>EddicKingmakerTweaks</AssemblyName>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!-- Game assemblies are provided by the game at runtime; never copy them to output. -->
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Game install location comes from the KingmakerDir environment variable (set per machine);
+         override with -p:KingmakerInstallDir if the game lives elsewhere. -->
+    <KingmakerInstallDir Condition="'$(KingmakerInstallDir)' == ''">$(KingmakerDir)</KingmakerInstallDir>
+    <ManagedDir>$(KingmakerInstallDir)\Kingmaker_Data\Managed</ManagedDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Pinned to the 0Harmony.dll version shipped by the installed Unity Mod Manager. -->
+    <PackageReference Include="Lib.Harmony" Version="2.3.6" ExcludeAssets="runtime" />
+    <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Compile against a publicized copy of the game assembly so private members are accessible. -->
+    <Publicize Include="Assembly-CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp" Private="false">
+      <HintPath>$(ManagedDir)\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityModManager" Private="false">
+      <HintPath>$(ManagedDir)\UnityModManager\UnityModManager.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine" Private="false">
+      <HintPath>$(ManagedDir)\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule" Private="false">
+      <HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule" Private="false">
+      <HintPath>$(ManagedDir)\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <!-- Texture2D.LoadImage lives here (custom icon loading). -->
+    <Reference Include="UnityEngine.ImageConversionModule" Private="false">
+      <HintPath>$(ManagedDir)\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Info.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Icons\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- Deploy the built mod into the game's Mods folder so UMM picks it up. -->
+  <Target Name="DeployToGame" AfterTargets="Build">
+    <ItemGroup>
+      <ModFiles Include="$(TargetDir)$(AssemblyName).dll;$(TargetDir)$(AssemblyName).pdb;$(TargetDir)Info.json" />
+      <ModIconFiles Include="$(TargetDir)Icons\**" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ModFiles)" DestinationFolder="$(KingmakerInstallDir)\Mods\$(AssemblyName)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ModIconFiles)" DestinationFolder="$(KingmakerInstallDir)\Mods\$(AssemblyName)\Icons" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Fail fast with a clear message when the game can't be found (e.g. KingmakerDir not set). -->
+  <Target Name="EnsureGameFound" BeforeTargets="BeforeBuild">
+    <Error Condition="!Exists('$(ManagedDir)\Assembly-CSharp.dll')" Text="Pathfinder: Kingmaker not found at '$(KingmakerInstallDir)' - set the KingmakerDir environment variable to the game's install folder." />
+  </Target>
+
+</Project>

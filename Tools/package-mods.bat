@@ -8,7 +8,7 @@ rem NOTE: when we create a new mod, add it to MODS below and to deploy-mods.bat.
 rem Lives in the repo's Tools\ - work from the repo root.
 cd /d "%~dp0.."
 
-set MODS=EddicKingmaker EddicKingmakerBuffs EddicKingmakerLoot EddicKingmakerRespec
+set MODS=EddicKingmakerTweaks EddicKingmakerBuffs EddicKingmakerLoot EddicKingmakerRespec
 
 for %%M in (%MODS%) do (
     echo === Building %%M ^(Release^) ===
