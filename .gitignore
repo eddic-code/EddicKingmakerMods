@@ -427,3 +427,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Packaged mod release zips (built by Tools\package-mods.bat)
+Tools/*.zip

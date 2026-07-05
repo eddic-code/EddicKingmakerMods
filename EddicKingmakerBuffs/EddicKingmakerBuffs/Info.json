@@ -1,0 +1,8 @@
+{
+  "Id": "EddicKingmakerBuffs",
+  "DisplayName": "EddicKingmakerBuffs",
+  "Author": "Eddic",
+  "Version": "1.0",
+  "AssemblyName": "EddicKingmakerBuffs.dll",
+  "EntryMethod": "EddicKingmakerBuffs.Main.Load"
+}

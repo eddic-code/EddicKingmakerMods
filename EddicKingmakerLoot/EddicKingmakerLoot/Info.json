@@ -1,0 +1,8 @@
+{
+  "Id": "EddicKingmakerLoot",
+  "DisplayName": "EddicKingmakerLoot",
+  "Author": "Eddic",
+  "Version": "1.0",
+  "AssemblyName": "EddicKingmakerLoot.dll",
+  "EntryMethod": "EddicKingmakerLoot.Main.Load"
+}

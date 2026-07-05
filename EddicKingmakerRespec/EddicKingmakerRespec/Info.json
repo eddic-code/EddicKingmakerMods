@@ -1,0 +1,8 @@
+{
+  "Id": "EddicKingmakerRespec",
+  "DisplayName": "EddicKingmakerRespec",
+  "Author": "Eddic",
+  "Version": "1.0",
+  "AssemblyName": "EddicKingmakerRespec.dll",
+  "EntryMethod": "EddicKingmakerRespec.Main.Load"
+}

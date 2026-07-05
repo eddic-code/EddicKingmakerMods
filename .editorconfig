@@ -1,0 +1,9 @@
+# Analyzer tuning for all EddicKingmakerMods projects.
+root = true
+
+[*.cs]
+# Harmony invokes patch methods (Prefix/Postfix/Transpiler) and UMM invokes entry
+# points via reflection, so the IDE sees them as unused private members and fades
+# them out. Disable the "unused private member" rules that cause the fading.
+dotnet_diagnostic.IDE0051.severity = none  # private member is unused
+dotnet_diagnostic.IDE0052.severity = none  # private member is written but never read
