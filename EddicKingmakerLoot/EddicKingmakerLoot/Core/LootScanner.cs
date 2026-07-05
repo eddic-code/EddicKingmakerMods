@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Kingmaker;
+using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Items;
+using Kingmaker.Blueprints.Items.Components;
 using Kingmaker.Items;
 using Kingmaker.UnitLogic;
 using Kingmaker.View.MapObjects;
@@ -18,36 +21,42 @@ namespace EddicKingmakerLoot.Core
             if (Game.Instance?.CurrentlyLoadedArea == null)
                 return;
 
-            var names = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-            ScanUnits(names);
-            ScanMapObjects(names);
+            var itemsByName = new SortedDictionary<string, ItemEntity>(StringComparer.OrdinalIgnoreCase);
+            ScanUnits(itemsByName);
+            ScanMapObjects(itemsByName);
 
             string areaName = Game.Instance.CurrentlyLoadedArea.AreaDisplayName;
-            if (names.Count == 0)
+            string filterNote = Main.Settings.HideVendorTrash ? ", vendor trash hidden" : "";
+            if (itemsByName.Count == 0)
             {
-                GameLog.Message($"No lootable items in {areaName}.");
+                GameLog.Message($"No lootable items in {areaName}{filterNote}.");
                 return;
             }
 
-            GameLog.Message($"Lootable items in {areaName} ({names.Count}):");
-            foreach (string name in names)
-                GameLog.Message("  " + name);
+            GameLog.Message($"Lootable items in {areaName} ({itemsByName.Count}{filterNote}):");
+            foreach (var entry in itemsByName)
+            {
+                // A detached copy as tooltip shows the hoverable item card (like vanilla
+                // loot lines) without the log holding a reference to the live item.
+                GameLog.Message("  " + entry.Key,
+                    tooltip: ItemsEntityFactory.CreateItemCopy(entry.Value, 1));
+            }
         }
 
         /// <summary>Loot carried by units: enemies-to-be-killed and dead bodies alike.</summary>
-        private static void ScanUnits(ISet<string> names)
+        private static void ScanUnits(IDictionary<string, ItemEntity> itemsByName)
         {
             foreach (var unit in Game.Instance.State.Units)
             {
                 if (unit.IsPlayerFaction || unit.Descriptor.State.HasCondition(UnitCondition.Unlootable))
                     continue;
 
-                AddItems(names, unit.Inventory);
+                AddItems(itemsByName, unit.Inventory);
             }
         }
 
         /// <summary>Loot in map containers: chests, environment stashes, dropped bags.</summary>
-        private static void ScanMapObjects(ISet<string> names)
+        private static void ScanMapObjects(IDictionary<string, ItemEntity> itemsByName)
         {
             foreach (var mapObject in Game.Instance.State.MapObjects)
             {
@@ -63,19 +72,27 @@ namespace EddicKingmakerLoot.Core
 
                     var data = mapObject.GetComponentData<LootComponent.LootPersistentData>();
                     if (data?.Loot != null)
-                        AddItems(names, data.Loot);
+                        AddItems(itemsByName, data.Loot);
                 }
             }
         }
 
-        private static void AddItems(ISet<string> names, IEnumerable<ItemEntity> items)
+        private static void AddItems(IDictionary<string, ItemEntity> itemsByName, IEnumerable<ItemEntity> items)
         {
             foreach (var item in items)
             {
+                // MiscellaneousType != None (gems, jewellery, animal parts) is the game's
+                // own sell-junk classification, used by the vendor mass-sale option.
+                // MoneyReplacement marks money items (Gold Coins) that convert to gold on pickup.
+                if (Main.Settings.HideVendorTrash
+                    && (item.Blueprint.MiscellaneousType != BlueprintItem.MiscellaneousItemType.None
+                        || item.Blueprint.GetComponent<MoneyReplacement>() != null))
+                    continue;
+
                 // ItemEntity.Name shows NonIdentifiedName for unidentified items,
                 // matching what the player sees in loot windows.
-                if (item.IsLootable && !string.IsNullOrEmpty(item.Name))
-                    names.Add(item.Name);
+                if (item.IsLootable && !string.IsNullOrEmpty(item.Name) && !itemsByName.ContainsKey(item.Name))
+                    itemsByName.Add(item.Name, item);
             }
         }
     }

@@ -9,11 +9,9 @@ namespace EddicKingmakerLoot
 {
     public static class Main
     {
-        /// <summary>Prints all lootable items in the current area to the in-game log.</summary>
-        private const KeyCode ListAreaLootKey = KeyCode.F3;
-
         public static UnityModManager.ModEntry.ModLogger Logger;
         public static bool Enabled;
+        public static Settings Settings;
 
         /// <summary>The mod's folder inside the game's Mods directory.</summary>
         public static string ModFolder;
@@ -22,8 +20,11 @@ namespace EddicKingmakerLoot
         {
             Logger = modEntry.Logger;
             ModFolder = modEntry.Path;
+            Settings = UnityModManager.ModSettings.Load<Settings>(modEntry);
             modEntry.OnToggle = OnToggle;
             modEntry.OnUpdate = OnUpdate;
+            modEntry.OnGUI = OnGUI;
+            modEntry.OnSaveGUI = OnSaveGUI;
 
             var harmony = new Harmony(modEntry.Info.Id);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
@@ -43,7 +44,7 @@ namespace EddicKingmakerLoot
             if (!Enabled)
                 return;
 
-            if (Input.GetKeyDown(ListAreaLootKey))
+            if (Settings.ListAreaLootKey.Down())
             {
                 try
                 {
@@ -54,6 +55,18 @@ namespace EddicKingmakerLoot
                     Logger.LogException(ex);
                 }
             }
+        }
+
+        private static void OnGUI(UnityModManager.ModEntry modEntry)
+        {
+            UnityModManager.UI.DrawKeybindingSmart(Settings.ListAreaLootKey, "List area loot", null, GUILayout.ExpandWidth(false));
+            Settings.HideVendorTrash = GUILayout.Toggle(Settings.HideVendorTrash,
+                " Hide vendor trash (gems, jewellery, animal parts)", GUILayout.ExpandWidth(false));
+        }
+
+        private static void OnSaveGUI(UnityModManager.ModEntry modEntry)
+        {
+            Settings.Save(modEntry);
         }
     }
 }
