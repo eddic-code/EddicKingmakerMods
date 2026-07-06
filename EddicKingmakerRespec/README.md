@@ -36,18 +36,17 @@ Pick a character in the window and confirm — the regular level-up interface op
 
 ### Manual
 
-1. Install Unity Mod Manager and point it at your Pathfinder: Kingmaker folder (this step is still required — UMM loads the mod).
+1. Install Unity Mod Manager and point it at your Pathfinder: Kingmaker folder.
 2. Extract the archive into the game's `Mods` folder so that you end up with:
-   ```
+
    ...\Steam\steamapps\common\Pathfinder Kingmaker\Mods\EddicKingmakerRespec\EddicKingmakerRespec.dll
    ...\Steam\steamapps\common\Pathfinder Kingmaker\Mods\EddicKingmakerRespec\Info.json
-   ```
-   (Create the `Mods` folder if it doesn't exist yet.)
+
 3. Launch the game and check the UMM window (Ctrl+F10) to confirm the mod is loaded and enabled.
 
 ## Uninstalling
 
-Toggle the mod off in the UMM window, or delete the `Mods\EddicKingmakerRespec` folder. The mod adds no new items, feats or other content to your save — respecs you already completed are plain vanilla character data, so saves remain safe with the mod removed.
+Toggle the mod off in the UMM window, or delete the `Mods\EddicKingmakerRespec` folder. The mod adds no new items, feats or other content to your save. Respecs you already completed are plain vanilla character data, so saves remain safe with the mod removed.
 
 ## Good to know
 
